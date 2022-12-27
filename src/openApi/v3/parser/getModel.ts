@@ -48,6 +48,12 @@ export const getModel = (
         properties: [],
     };
 
+    let isAddress = false;
+    if (name === 'Address') {
+        console.log('getModel Address', definition);
+        isAddress = true;
+    }
+
     if (definition.$ref) {
         const definitionRef = getType(definition.$ref);
         model.export = 'reference';
@@ -56,6 +62,7 @@ export const getModel = (
         model.template = definitionRef.template;
         model.imports.push(...definitionRef.imports);
         model.default = getModelDefault(definition, model);
+        model.debugInfo = JSON.stringify(model, null, 2);
         return model;
     }
 
@@ -68,6 +75,7 @@ export const getModel = (
             model.base = 'string';
             model.enum.push(...extendedEnumerators);
             model.default = getModelDefault(definition, model);
+            model.debugInfo = JSON.stringify(model, null, 2);
             return model;
         }
     }
@@ -81,6 +89,7 @@ export const getModel = (
             model.template = arrayItems.template;
             model.imports.push(...arrayItems.imports);
             model.default = getModelDefault(definition, model);
+            model.debugInfo = JSON.stringify(model, null, 2);
             return model;
         } else {
             const arrayItems = getModel(openApi, definition.items);
@@ -91,6 +100,7 @@ export const getModel = (
             model.link = arrayItems;
             model.imports.push(...arrayItems.imports);
             model.default = getModelDefault(definition, model);
+            model.debugInfo = JSON.stringify(model, null, 2);
             return model;
         }
     }
@@ -108,6 +118,7 @@ export const getModel = (
             model.template = additionalProperties.template;
             model.imports.push(...additionalProperties.imports);
             model.default = getModelDefault(definition, model);
+            model.debugInfo = JSON.stringify(model, null, 2);
             return model;
         } else {
             const additionalProperties = getModel(openApi, ap);
@@ -118,6 +129,7 @@ export const getModel = (
             model.link = additionalProperties;
             model.imports.push(...additionalProperties.imports);
             model.default = getModelDefault(definition, model);
+            model.debugInfo = JSON.stringify(model, null, 2);
             return model;
         }
     }
@@ -128,6 +140,7 @@ export const getModel = (
         model.imports.push(...composition.imports);
         model.properties.push(...composition.properties);
         model.enums.push(...composition.enums);
+        model.debugInfo = JSON.stringify(model, null, 2);
         return model;
     }
 
@@ -137,6 +150,7 @@ export const getModel = (
         model.imports.push(...composition.imports);
         model.properties.push(...composition.properties);
         model.enums.push(...composition.enums);
+        model.debugInfo = JSON.stringify(model, null, 2);
         return model;
     }
 
@@ -146,9 +160,11 @@ export const getModel = (
         model.imports.push(...composition.imports);
         model.properties.push(...composition.properties);
         model.enums.push(...composition.enums);
+        model.debugInfo = JSON.stringify(model, null, 2);
         return model;
     }
 
+    // here 
     if (definition.type === 'object') {
         if (definition.properties) {
             model.export = 'interface';
@@ -158,6 +174,9 @@ export const getModel = (
 
             const modelProperties = getModelProperties(openApi, definition, getModel, model);
             modelProperties.forEach(modelProperty => {
+                if (isAddress && modelProperty.name === 'type') {
+                    console.log('getModel reading properties', modelProperty);
+                }
                 model.imports.push(...modelProperty.imports);
                 model.enums.push(...modelProperty.enums);
                 model.properties.push(modelProperty);
@@ -165,6 +184,7 @@ export const getModel = (
                     model.enums.push(modelProperty);
                 }
             });
+            model.debugInfo = JSON.stringify(model, null, 2);
             return model;
         } else {
             const additionalProperties = getModel(openApi, {});
@@ -175,6 +195,7 @@ export const getModel = (
             model.link = additionalProperties;
             model.imports.push(...additionalProperties.imports);
             model.default = getModelDefault(definition, model);
+            model.debugInfo = JSON.stringify(model, null, 2);
             return model;
         }
     }
@@ -189,8 +210,10 @@ export const getModel = (
         model.isNullable = definitionType.isNullable || model.isNullable;
         model.imports.push(...definitionType.imports);
         model.default = getModelDefault(definition, model);
+        model.debugInfo = JSON.stringify(model, null, 2);
         return model;
     }
 
+    model.debugInfo = JSON.stringify(model, null, 2);
     return model;
 };

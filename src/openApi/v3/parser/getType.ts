@@ -1,5 +1,6 @@
 import type { Type } from '../../../client/interfaces/Type';
 import { isDefined } from '../../../utils/isDefined';
+import { OpenApi } from '../interfaces/OpenApi';
 import { getMappedType } from './getMappedType';
 import { stripNamespace } from './stripNamespace';
 
@@ -12,13 +13,14 @@ const encode = (value: string): string => {
  * @param type String or String[] value like "integer", "Link[Model]" or ["string", "null"].
  * @param format String value like "binary" or "date".
  */
-export const getType = (type: string | string[] = 'any', format?: string): Type => {
+export const getType = (type: string | string[] = 'any', format?: string, openApi?: OpenApi): Type => {
     const result: Type = {
         type: 'any',
         base: 'any',
         template: null,
         imports: [],
         isNullable: false,
+        isEnum: false
     };
 
     // Special case for JSON Schema spec (december 2020, page 17),
@@ -35,6 +37,14 @@ export const getType = (type: string | string[] = 'any', format?: string): Type 
         return result;
     }
 
+    if (type === '#/components/schemas/AddressType') {
+        console.log('getType: ', '#/components/schemas/AddressType');
+    }
+    if (type === 'AddressType') {
+        console.trace('getType: ', type);
+        console.log('the enum type', openApi?.components?.schemas?.['AddressType']);
+    }
+
     const mapped = getMappedType(type, format);
     if (mapped) {
         result.type = mapped;
@@ -43,6 +53,9 @@ export const getType = (type: string | string[] = 'any', format?: string): Type 
     }
 
     const typeWithoutNamespace = decodeURIComponent(stripNamespace(type));
+    console.log('typeWithoutNamespace', typeWithoutNamespace);
+
+    result.isEnum = !!openApi?.components?.schemas?.[typeWithoutNamespace]?.enum;
 
     if (/\[.*\]$/g.test(typeWithoutNamespace)) {
         const matches = typeWithoutNamespace.match(/(.*?)\[(.*)\]$/);

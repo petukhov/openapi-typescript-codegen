@@ -101,6 +101,8 @@ export const generate = async ({
         }
 
         case OpenApiVersion.V3: {
+            console.log('openApi', openApi);
+            console.log('AddressType', openApi.components.schemas.AddressType);
             const client = parseV3(openApi);
             const clientFinal = postProcessClient(client);
             if (!write) break;

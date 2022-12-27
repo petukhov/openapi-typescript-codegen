@@ -8,7 +8,8 @@
 {{/if}}
  */
 {{/ifdef}}
-export type {{{name}}} = {
+// this is export interface
+export class {{{name}}} {
 	{{#each properties}}
 	{{#ifdef description deprecated}}
 	/**
@@ -20,10 +21,10 @@ export type {{{name}}} = {
 	{{/if}}
 	 */
 	{{/ifdef}}
-	{{>isReadOnly}}{{{name}}}{{>isRequired}}: {{>type parent=../name}};
+	{{>isReadOnly}}{{{name}}} = {{>type parent=../name}};
 	{{/each}}
 };
-{{#if enums}}
+{{!-- {{#if enums}}
 {{#unless @root.useUnionTypes}}
 
 export namespace {{{name}}} {
@@ -44,4 +45,4 @@ export namespace {{{name}}} {
 
 }
 {{/unless}}
-{{/if}}
+{{/if}} --}}

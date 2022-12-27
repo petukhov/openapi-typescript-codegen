@@ -4,4 +4,5 @@ export interface Type {
     template: string | null;
     imports: string[];
     isNullable: boolean;
+    isEnum: boolean;
 }

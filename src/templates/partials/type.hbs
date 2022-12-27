@@ -1,4 +1,4 @@
-{{#equals export 'interface'}}
+{{!-- {{#equals export 'interface'}}
 {{>typeInterface}}
 {{else equals export 'reference'}}
 {{>typeReference}}
@@ -16,4 +16,17 @@
 {{>typeIntersection}}
 {{else}}
 {{>typeGeneric}}
-{{/equals}}
+{{/equals}} --}}
+{{#equals type 'string'~}}
+''
+{{~else equals type 'number'~}}
+0
+{{~else equals export 'enum'~}}
+ModelHint.enum({{type}})
+{{~else equals export 'array'~}}
+ModelHint.array({{type}})
+{{~else equals export 'reference'~}}
+ModelHint.model({{type}})
+{{else}}
+{} as any
+{{~/equals}}

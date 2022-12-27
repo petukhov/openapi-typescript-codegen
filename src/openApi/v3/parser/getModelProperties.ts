@@ -71,9 +71,14 @@ export const getModelProperties = (
                     ...propertyValues,
                 });
             } else if (property.$ref) {
-                const model = getType(property.$ref);
+                // add resolving logic here to handle enums.
+                const model = getType(property.$ref, undefined, openApi);
+                if (property.$ref === '#/components/schemas/AddressType') {
+                    console.log('getModelProperties', model);
+                    console.log('getModelProperties openapi', openApi);
+                }
                 models.push({
-                    export: 'reference',
+                    export: model.isEnum ? 'enum' : 'reference',
                     type: model.type,
                     base: model.base,
                     template: model.template,
